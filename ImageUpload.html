@@ -1,0 +1,45 @@
+<html>
+<head>
+ <script type="text/javascript" src="DCSResources/dynamsoft.webcam.config.js"> </script>
+<script type="text/javascript" src="DCSResources/dynamsoft.webcam.initiate.js"> </script>
+</head>
+<body>
+<div id="video-container" style="width: 500px; height: 400px; display: inline-block; border: solid 1px gray"> </div>
+<div id="image-container" style="width: 500px; height: 400px; display: inline-block; border: solid 1px gray"> </div>
+<script type="text/javascript">
+dynamsoft.dcsEnv.init('video-container', 'image-container', onInitSuccess, onInitFailure);
+function onInitSuccess(videoViewerId, imageViewerId) {
+dcsObject = dynamsoft.dcsEnv.getObject(videoViewerId);
+dcsObject.camera.playVideo(); 
+}
+</script>
+
+<input type="button" value="Grab" onclick="acquireImage();" />
+
+<script type="text/javascript">
+//capture an image
+function acquireImage() {
+ if (dcsObject) {
+ dcsObject.camera.captureImage('image-container');
+ }
+ }
+</script>
+
+<a id="btn-upload" class="btn-upload" onclick="onBtnUploadClick(this);">Upload</a>
+
+<script type="text/javascript">
+  function onBtnUploadClick() {   
+var imageViewer = dcsObject.getImageViewer('image-container');
+    var counter,
+        url = getCurPagePath() + 'ActionPage.php',
+        fileName = “test.jpg”,
+        imageType = imageViewer.io.EnumImageType.JPEG;
+        imageIndexArray = [0];
+ 
+    imageViewer.io.setHTTPFormFields({ "fileName": fileName });
+    imageViewer.io.httpUploadAsync(url, imageIndexArray, imageType, onUploadSuccess, onUploadFailure);
+ 
+} 
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<html>
+<head>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div align="center" style="border:2px solid #f5411e;width:400px;height:300px;margin-top:80px;margin-left:500px;">
+<p> <canvas id="canvas"></canvas> </p>
+<button id="start-button" onclick="startFunction()">Click here</button>
+<button onclick="invert()">Invert PIC</button>
+
+<button type="submit" value="submit"><a href="user-login.php">SUBMIT</a></button>
+</div>
+<script>
+const constraints = { "video": { width: { max: 320 } } };
+var canvas = document.getElementById('canvas');
+var videoTrack;
+
+function startFunction() {
+  navigator.mediaDevices.getUserMedia(constraints)
+      .then(gotMedia)
+      .catch(e => { console.error('getUserMedia() failed: ', e); });
+}
+
+function gotMedia(mediastream) {
+  videoTrack = mediastream.getVideoTracks()[0];
+  var imageCapture = new ImageCapture(videoTrack);
+  imageCapture.grabFrame()
+      .then(processFrame)
+      .catch(e => console.error('grabFrame() failed: ' + e));
+}
+
+function processFrame(imageBitmap) {
+  canvas.width = imageBitmap.width;
+  canvas.height = imageBitmap.height;
+  canvas.getContext('2d').drawImage(imageBitmap, 0, 0);
+
+  videoTrack.stop();
+}
+
+function invert() {
+  var ctx = canvas.getContext('2d');
+  var imageData = ctx.getImageData(0,0,canvas.width, canvas.height);
+
+  var data = imageData.data;
+  for (var i = 0; i < data.length; i += 4) {
+    data[i]     = 255 - data[i];     // red
+    data[i + 1] = 255 - data[i + 1]; // green
+    data[i + 2] = 255 - data[i + 2]; // blue
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+</script>
+
+</body>
+</html>
